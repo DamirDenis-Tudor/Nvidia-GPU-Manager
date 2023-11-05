@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 IFS=$'\n'
 
@@ -40,6 +40,9 @@ help() {
     print " --help    | -h : print help menu "
 }
 
+# Function that checks the status of the NVIDIA GPU.
+# It simply verifies whether the NVIDIA Device in the screen block is commented or not.
+# This was the simplest solution I could find.
 check_nvidia_gpu_status() {
     local commented_device
     commented_device=$(sed -n "/^\s*Section \"Screen\"/,/^EndSection/{/#\s*Device\s* \"$1\"/p}" "$XORG_CONFIG")
@@ -52,34 +55,38 @@ check_nvidia_gpu_status() {
     fi
 }
 
-# verify if the script was executed as root
+# Verify if the script was executed as root
 if [ "$(id -u)" != "0" ]; then
     print "This script must be run with superuser privileges. Use 'sudo'." "error"
     exit 1
 fi
 
-# check x11 config file
+# Note: If the configuration file is not found please visit:
+# https://www.x.org/releases/current/doc/man/man5/xorg.conf.5.xhtml
 XORG_CONFIG="/etc/X11/xorg.conf"
 if ! [[ -f $XORG_CONFIG ]];then
     print "X11/xorg.conf not found" "error"
     exit 1
 fi
 
-# check nvidia device identifier
-GPU_DEVICE=$(grep -B2 -E 'Driver\s+"nvidia"' "/etc/X11/xorg.conf" | grep "Identifier" | awk '{gsub(/"/, "", $2); print $2}')
-
+# Check nvidia device identifier. From all the device blocks extract pair of
+# Driver "nvidia" and Identifier "ID_DEVICE"
+GPU_DEVICE=$(grep -B2 -E 'Driver\s+"nvidia"' $XORG_CONFIG | grep "Identifier" | awk '{gsub(/"/, "", $2); print $2}')
 if ! [[ -n $GPU_DEVICE ]];then
     print "Corespondent device for NVIDIA GPU was not found in $XORG_CONFIG." "error"
     exit 1
 fi;
 
 
-# extract the bus id of the nvidia board
+# The PCI identifier of you NVIDIA GPU must be extracted
 NGPU=$(lspci | grep -i VGA | grep -i NVIDIA)
-
 if [ -n "$NGPU" ]; then
     PCI=$(echo "$NGPU" | awk '{print $1}')
-    NGPU_BUS_ID="0000:$PCI"
+    if [[ $PCI =~ ^\d{4}:\d{2}:\d{2}\.\d$ ]]; then
+        NGPU_BUS_ID="0000:$PCI"
+    else
+        NGPU_BUS_ID=$PCI
+    fi
 else
     print "Nvidia GPU not found." "error"
     exit 1
@@ -90,18 +97,30 @@ ACTION=""
 # check the command line arguments
 if [[ $1 =~ ^(--enable|-e)$ ]]; then
     print "Enabling NVIDIA GPU..." "info"
+
+    # Simply uncomment GPU NVIDIA device line from Screen Section
     sed -i "/^\s*Section \"Screen\"/,/EndSection/ s/#//" $XORG_CONFIG
     ACTION="bind"
+
 elif [[ $1 =~ ^(--disable|-d)$ ]]; then
     print "Disabling NVIDIA GPU..." "info"
+
+    # Simply comment GPU NVIDIA device line from Screen Section
     sed -i "/^\s*Section \"Screen\"/,/EndSection/ s/^\s*Device[[:space:]]*\"$GPU_DEVICE\"/#&/" $XORG_CONFIG
     ACTION="unbind"
+
 elif [[ $1 =~ ^(--status|-s)$ ]]; then
+
     check_nvidia_gpu_status "$GPU_DEVICE"
+
 elif [[ $1 =~ ^(--help|-h)$ ]]; then
+
     help
+
 elif [[ $1 =~ ^(--info|-i)$ ]]; then
+
     nvidia-smi
+
 else
     print "Invalid choice." "error"
     help
@@ -109,8 +128,22 @@ fi;
 
 # e/d the nvidia gpu
 if [[ -n $ACTION  ]]; then
+
+    # Check Display Manager Service
+    DMS=""
+    if [[ -n $(systemctl list-units --type=service | grep gdm) ]]; then
+        DMS="gdm"
+    elif [[ -n $(systemctl list-units --type=service | grep lightdm) ]]; then
+        DMS="lightdm"
+    elif [[ -n $(systemctl list-units --type=service | grep sddm) ]]; then
+        DMS="sddm"
+    else
+        print "Invalid Display Manager Service" "error"
+        exit 1
+    fi
+
     print "Your gnome session will be restarted in 5 seconds." "warning"
     sleep 5
-    service gdm restart &
+    service $DMS restart &
     echo -n $NGPU_BUS_ID > "/sys/bus/pci/drivers/nvidia/$ACTION";
 fi;

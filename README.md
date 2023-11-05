@@ -13,9 +13,9 @@
 
 # 2. Instalation  <a name="installation"></a>
 ```shell
-curl -LJO https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/raw/main/NvidiaGpuManager/ngpum
-chmod +x ngpum
-sudo mv ngpum /usr/bin/
+curl -LJO https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/raw/main/NvidiaGpuManager/ngpum.sh
+shc -f ngpum.sh -o ngpum; rm ngpun.sh.x.c ngpun.sh;
+chmod +x ngpum; sudo mv ngpum /usr/bin/
 ```
 
 # 3. Usage example  <a name="usage"></a>
