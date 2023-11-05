@@ -1,34 +1,52 @@
-# Nvidia-GPU-Manager
-#### This service makes it easy to manage your dedicated NVIDIA GPU.
+#   Content
+##  1) [Description](#description)
+##  2) [Instalation](#installation)
+##  3) [Usage](#usage)
+##  3) [Prerequisites](#prerequisites)
 
-# Instalation
+![image](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/ea280ed4-0177-485e-90a6-c7e44b1c2dfe)
+
+
+# 1. Nvidia-GPU-Manager <a name="description"></a>
+- This service makes it easy to manage your dedicated NVIDIA GPU.
+- The way it work is based on binding/unbing the Nvidia GPU device from its drivers.
+
+# 2. Instalation  <a name="installation"></a>
 ```shell
 curl -LJO https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/raw/main/NvidiaGpuManager/ngpum
 chmod +x ngpum
 sudo mv ngpum /usr/bin/
 ```
 
-# How to use it ( Usage example )
-### Disable GPU
+# 3. Usage example  <a name="usage"></a>
+- ### Disable GPU
 [Screencast from 2023-11-05 13-11-31.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/bd74a0cf-5d17-4aea-9602-86cf14b46805)
 
 <br>
 
-### Enagle GPU
+- ### Enagle GPU
 [Screencast from 2023-11-05 13-12-27.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/76f0d3cb-4965-441d-853b-68d63910cabd)
 
 <br>
 
-### Disable again GPU
+- ### Disable again GPU
 [Screencast from 2023-11-05 13-13-20.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/303c0291-fd26-4b7a-a0df-776eaab285ce)
 
 <br>
 
-# Prerequisites
+# 4. Prerequisites <a name="prerequisites"></a>
 
 ### 1. **Download the NVIDIA Driver:** Start by downloading the NVIDIA driver from [NVIDIA's website](https://www.nvidia.com/download/index.aspx).
 
 ### 2. **Prepare for Installation:**
+   - X server should be off.
+     ```shell
+     Using: nvidia-installer ncurses v6 user interface
+          -> Detected 16 CPUs online; setting concurrency level to 16.
+          -> The file '/tmp/.X0-lock' exists and appears to contain the process ID '11631' of a running X server.
+      ERROR: You appear to be running an X server; please exit X before installing. For further details, please see the section INSTALLING THE NVIDIA DRIVER in the README available on the Linux driver download page at [www.nvidia.com](https://www.nvidia.com).
+      ERROR: Installation has failed. Please see the file '/var/log/nvidia-installer.log' for details. You may find suggestions on fixing installation problems in the README available on the Linux driver download page at [www.nvidia.com](https://www.nvidia.com).
+     ```
    - To proceed over this issue, you must enter in `multi-user mode without GUI` with the command:
      ```shell
      sudo telinit 3
