@@ -3,7 +3,9 @@
 
 # Instalation
 ```shell
-
+curl -LJO https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/raw/main/NvidiaGpuManager/ngpum
+chmod +x ngpun
+sudo mv ngpun /usr/bin/
 ```
 
 ## Prerequisites
@@ -11,7 +13,7 @@
 1. **Download the NVIDIA Driver:** Start by downloading the NVIDIA driver from [NVIDIA's website](https://www.nvidia.com/download/index.aspx).
 
 2. **Prepare for Installation:**
-   - Ensure that the X server is not running. You may encounter an error during installation if the X server is active. If so, you can disable it using the following command:
+   - To proceed over this issue, you must enter in `multi-user mode without GUI` with the command:
      ```shell
      sudo telinit 3
      ```
@@ -28,13 +30,15 @@
 
    ![Error Image](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/6642cb9e-e616-4b07-9d94-de98a2a0b95c)
 
-   This problem arises because the installation process may create the `/etc/X11/xorg.config` file, which may not list your integrated AMD GPU.
+   This problem arises because the installation process may create the `/etc/X11/xorg.config` file, which may not list your integrated AMD GPU (my case).
 
 4. **Recovery Mode and Config Update:** To resolve this issue, follow these steps:
    - Reboot your system in recovery mode, allowing you to log in as the root user.
-   - Check for your AMD GPU PCI ID, e.g., `04:00.0`, using this command:
+   - Check for your AMD GPU (my case) PCI ID, e.g., `04:00.0`, using this command:
      ```shell
      lspci | grep VGA
+     01:00.0 VGA compatible controller: NVIDIA Corporation TU117M [GeForce GTX 1650 Mobile / Max-Q] (rev a1)
+     04:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Cezanne [Radeon Vega Series / Radeon Vega Mobile Series] (rev c5)
      ```
    - Open the `/etc/X11/xorg.conf` file. You may only see the Nvidia device listed.
 
