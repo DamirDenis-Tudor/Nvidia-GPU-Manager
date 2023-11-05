@@ -82,11 +82,12 @@ fi;
 NGPU=$(lspci | grep -i VGA | grep -i NVIDIA)
 if [ -n "$NGPU" ]; then
     PCI=$(echo "$NGPU" | awk '{print $1}')
-    if [[ $PCI =~ ^\d{4}:\d{2}:\d{2}\.\d$ ]]; then
-        NGPU_BUS_ID="0000:$PCI"
+    if [[ $PCI =~ ^(0000:*:*.*)$ ]]; then
+        NGPU_BUS_ID="$PCI"
     else
-        NGPU_BUS_ID=$PCI
+        NGPU_BUS_ID="0000:$PCI"
     fi
+    echo $NGPU_BUS_ID
 else
     print "Nvidia GPU not found." "error"
     exit 1
