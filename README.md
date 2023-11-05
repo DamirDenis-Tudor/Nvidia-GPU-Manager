@@ -8,14 +8,27 @@ chmod +x ngpum
 sudo mv ngpum /usr/bin/
 ```
 
-# Features
+# How to use it ( Usage example )
+### Disable GPU
+[Screencast from 2023-11-05 13-11-31.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/bd74a0cf-5d17-4aea-9602-86cf14b46805)
 
+<br>
 
-## Prerequisites
+### Enagle GPU
+[Screencast from 2023-11-05 13-12-27.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/76f0d3cb-4965-441d-853b-68d63910cabd)
 
-1. **Download the NVIDIA Driver:** Start by downloading the NVIDIA driver from [NVIDIA's website](https://www.nvidia.com/download/index.aspx).
+<br>
 
-2. **Prepare for Installation:**
+### Disable again GPU
+[Screencast from 2023-11-05 13-13-20.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/303c0291-fd26-4b7a-a0df-776eaab285ce)
+
+<br>
+
+# Prerequisites
+
+### 1. **Download the NVIDIA Driver:** Start by downloading the NVIDIA driver from [NVIDIA's website](https://www.nvidia.com/download/index.aspx).
+
+### 2. **Prepare for Installation:**
    - To proceed over this issue, you must enter in `multi-user mode without GUI` with the command:
      ```shell
      sudo telinit 3
@@ -29,13 +42,13 @@ sudo mv ngpum /usr/bin/
      ERROR: Unable to find the development tool 'cc' in your path; please make sure that you have the 'gcc' package installed. If 'gcc' is installed, check that 'cc' is in your PATH.
      ```
 
-3. **Post-Installation Reboot:** After installation, if you reboot your system, you may encounter issues.
+### 3. **Post-Installation Reboot:** After installation, if you reboot your system, you may encounter issues.
 
    ![Error Image](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/6642cb9e-e616-4b07-9d94-de98a2a0b95c)
 
    This problem arises because the installation process may create the `/etc/X11/xorg.config` file, which may not list your integrated AMD GPU (my case).
 
-4. **Recovery Mode and Config Update:** To resolve this issue, follow these steps:
+### 4. **Recovery Mode and Config Update:** To resolve this issue, follow these steps:
    - Reboot your system in recovery mode, allowing you to log in as the root user.
    - Check for your AMD GPU (my case) PCI ID, e.g., `04:00.0`, using this command:
      ```shell
@@ -53,5 +66,5 @@ sudo mv ngpum /usr/bin/
 
    - If you cannot find `/etc/X11/xorg.conf`, refer to [this link](https://www.x.org/releases/current/doc/man/man5/xorg.conf.5.xhtml) for further guidance.
 
-5. **Now you're all set! 😄**
+### 5. **Now you're all set! 😄**
 
