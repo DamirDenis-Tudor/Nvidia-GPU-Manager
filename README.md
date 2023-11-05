@@ -4,9 +4,12 @@
 # Instalation
 ```shell
 curl -LJO https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/raw/main/NvidiaGpuManager/ngpum
-chmod +x ngpun
-sudo mv ngpun /usr/bin/
+chmod +x ngpum
+sudo mv ngpum /usr/bin/
 ```
+
+# Features
+
 
 ## Prerequisites
 
