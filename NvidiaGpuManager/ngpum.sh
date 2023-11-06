@@ -13,19 +13,19 @@ COLOR_CYAN='\e[36m'
 print() {
     case "$2" in
         "info")
-            echo -e "${COLOR_CYAN} $1 ${COLOR_RESET}"
+            echo -e "${COLOR_CYAN}$1 ${COLOR_RESET}"
             ;;
         "warning")
-            echo -e "${COLOR_YELLOW} $1 ${COLOR_RESET}"
+            echo -e "${COLOR_YELLOW}$1 ${COLOR_RESET}"
             ;;
         "error")
-            echo -e "${COLOR_RED} $1 ${COLOR_RESET}"
+            echo -e "${COLOR_RED}$1 ${COLOR_RESET}"
             ;;
         "ok")
-            echo -e "${COLOR_GREEN} $1 ${COLOR_RESET}"
+            echo -e "${COLOR_GREEN}$1 ${COLOR_RESET}"
             ;;
         *)
-            echo -e "\t$1"
+            echo -e "$1"
             ;;
     esac
 }
@@ -33,11 +33,11 @@ print() {
 # help function
 help() {
     print "Those arguments are accepted: " "info"
-    print " --enable  | -e : enables the nvidia gpu "
-    print " --disable | -d : disables the nvidia gpu "
-    print " --status  | -s : print the nvidia gpu status "
-    print " --info    | -i : print the nvidia gpu info "
-    print " --help    | -h : print help menu "
+    print "\t --enable  | -e : enables the nvidia gpu "
+    print "\t --disable | -d : disables the nvidia gpu "
+    print "\t --status  | -s : print the nvidia gpu status "
+    print "\t --info    | -i : print the nvidia gpu info "
+    print "\t --help    | -h : print help menu "
 }
 
 # Function that checks the status of the NVIDIA GPU.
@@ -87,7 +87,6 @@ if [ -n "$NGPU" ]; then
     else
         NGPU_BUS_ID="0000:$PCI"
     fi
-    echo $NGPU_BUS_ID
 else
     print "Nvidia GPU not found." "error"
     exit 1
@@ -97,18 +96,36 @@ fi
 ACTION=""
 # check the command line arguments
 if [[ $1 =~ ^(--enable|-e)$ ]]; then
-    print "Enabling NVIDIA GPU..." "info"
 
-    # Simply uncomment GPU NVIDIA device line from Screen Section
-    sed -i "/^\s*Section \"Screen\"/,/EndSection/ s/#//" $XORG_CONFIG
-    ACTION="bind"
+    if ! [[ $(check_nvidia_gpu_status "$GPU_DEVICE") ]]; then
+        print "Enabling NVIDIA GPU..." "info"
+
+        # add nouveau on blacklist
+        find /usr/lib/modprobe.d/ -type f ! -name "aliases.conf" ! -name "systemd.conf" ! -name "ngpu-blacklist.conf" -delete
+        echo "blacklist nouveau" > "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+        echo "options nouveau modeset=0" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+
+        # Simply uncomment GPU NVIDIA device line from Screen Section
+        sed -i "/^\s*Section \"Screen\"/,/EndSection/ s/#//" $XORG_CONFIG
+        ACTION="bind"
+    fi;
 
 elif [[ $1 =~ ^(--disable|-d)$ ]]; then
-    print "Disabling NVIDIA GPU..." "info"
+    if [[ $(check_nvidia_gpu_status "$GPU_DEVICE") ]]; then
+        print "Disabling NVIDIA GPU..." "info"
 
-    # Simply comment GPU NVIDIA device line from Screen Section
-    sed -i "/^\s*Section \"Screen\"/,/EndSection/ s/^\s*Device[[:space:]]*\"$GPU_DEVICE\"/#&/" $XORG_CONFIG
-    ACTION="unbind"
+        # add nvidia drivers to blacklist
+        find /usr/lib/modprobe.d/ -type f ! -name "aliases.conf" ! -name "systemd.conf" ! -name "ngpu-blacklist.conf" -delete
+        echo "blacklist nvidia" > "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+        echo "blacklist nvidia-modeset" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+        echo "blacklist nvidia-drm" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+        echo "blacklist nvidia-uvm" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+        echo "options nvidia modeset=0" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
+
+        # Simply comment GPU NVIDIA device line from Screen Section
+        sed -i "/^\s*Section \"Screen\"/,/EndSection/ s/^\s*Device[[:space:]]*\"$GPU_DEVICE\"/#&/" $XORG_CONFIG
+        ACTION="unbind"
+    fi
 
 elif [[ $1 =~ ^(--status|-s)$ ]]; then
 
@@ -129,22 +146,9 @@ fi;
 
 # e/d the nvidia gpu
 if [[ -n $ACTION  ]]; then
-
-    # Check Display Manager Service
-    DMS=""
-    if [[ -n $(systemctl list-units --type=service | grep gdm) ]]; then
-        DMS="gdm"
-    elif [[ -n $(systemctl list-units --type=service | grep lightdm) ]]; then
-        DMS="lightdm"
-    elif [[ -n $(systemctl list-units --type=service | grep sddm) ]]; then
-        DMS="sddm"
-    else
-        print "Invalid Display Manager Service" "error"
-        exit 1
-    fi
-
-    print "Your gnome session will be restarted in 5 seconds." "warning"
+    print "Your system will be restarted in 5 seconds." "warning"
     sleep 5
-    service $DMS restart &
-    echo -n $NGPU_BUS_ID > "/sys/bus/pci/drivers/nvidia/$ACTION";
+
+    echo -n $NGPU_BUS_ID > "/sys/bus/pci/drivers/nvidia/$ACTION" &
+    sudo reboot
 fi;
