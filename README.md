@@ -1,44 +1,38 @@
-#   Content
-##  1) [Description](#description)
-##  2) [Instalation](#installation)
-##  3) [Usage](#usage)
-##  3) [Prerequisites](#prerequisites)
+#  Table of contents
+1. [Description](#description)
+1. [Installation](#installation)
+1. [Example usage](#example-usage)
+1. [Prerequisites](#prerequisites)
 
 ![image](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/ea280ed4-0177-485e-90a6-c7e44b1c2dfe)
 
 
-# 1. Nvidia-GPU-Manager <a name="description"></a>
+# Description 
 - This service makes it easy to manage your dedicated NVIDIA GPU.
-- The way it work is based on binding/unbing the Nvidia GPU device from its drivers.
+- The way it works is based on binding/unbiding the Nvidia GPU device from its drivers.
 
-# 2. Instalation  <a name="installation"></a>
+# Installation
 ```shell
 curl -LJO https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/raw/main/NvidiaGpuManager/ngpum.sh
 shc -f ngpum.sh -o ngpum; rm ngpum.sh.x.c ngpum.sh;
 chmod +x ngpum; sudo mv ngpum /usr/bin/
 ```
 
-# 3. Usage example  <a name="usage"></a>
-- ### Disable GPU
+# Example usage
+## Disabling the GPU
 [Screencast from 2023-11-05 13-11-31.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/bd74a0cf-5d17-4aea-9602-86cf14b46805)
 
-<br>
+## Enabling the GPU
 
-- ### Enagle GPU
 [Screencast from 2023-11-05 13-12-27.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/76f0d3cb-4965-441d-853b-68d63910cabd)
 
-<br>
-
-- ### Disable again GPU
+### Disabling the GPU again
 [Screencast from 2023-11-05 13-13-20.webm](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/303c0291-fd26-4b7a-a0df-776eaab285ce)
 
-<br>
+# Prerequisites
 
-# 4. Prerequisites <a name="prerequisites"></a>
-
-### 1. **Download the NVIDIA Driver:** Start by downloading the NVIDIA driver from [NVIDIA's website](https://www.nvidia.com/download/index.aspx).
-
-### 2. **Prepare for Installation:**
+1. **Download the NVIDIA Driver:** Start by downloading the NVIDIA driver from [NVIDIA's website](https://www.nvidia.com/download/index.aspx).
+1. **Prepare for Installation:**
    - X server should be off.
      ```shell
      Using: nvidia-installer ncurses v6 user interface
@@ -51,7 +45,7 @@ chmod +x ngpum; sudo mv ngpum /usr/bin/
      ```shell
      sudo telinit 3
      ```
-   - Stop your display manager service (e.g., `lightdm` or `gdm`) with the following command:
+   - Stop your display manager service (for example`lightdm` or `gdm`) with the following command:
      ```shell
      sudo service gdm stop
      ```
@@ -60,13 +54,13 @@ chmod +x ngpum; sudo mv ngpum /usr/bin/
      ERROR: Unable to find the development tool 'cc' in your path; please make sure that you have the 'gcc' package installed. If 'gcc' is installed, check that 'cc' is in your PATH.
      ```
 
-### 3. **Post-Installation Reboot:** After installation, if you reboot your system, you may encounter issues.
+1. **Post-Installation Reboot:** After installation, if you reboot your system, you may encounter issues.
 
    ![Error Image](https://github.com/DamirDenis-Tudor/Nvidia-GPU-Manager/assets/101417927/6642cb9e-e616-4b07-9d94-de98a2a0b95c)
 
    This problem arises because the installation process may create the `/etc/X11/xorg.config` file, which may not list your integrated AMD GPU (my case).
 
-### 4. **Recovery Mode and Config Update:** To resolve this issue, follow these steps:
+1. **Recovery Mode and Config Update:** To resolve this issue, follow these steps:
    - Reboot your system in recovery mode, allowing you to log in as the root user.
    - Check for your AMD GPU (my case) PCI ID, e.g., `04:00.0`, using this command:
      ```shell
@@ -84,5 +78,5 @@ chmod +x ngpum; sudo mv ngpum /usr/bin/
 
    - If you cannot find `/etc/X11/xorg.conf`, refer to [this link](https://www.x.org/releases/current/doc/man/man5/xorg.conf.5.xhtml) for further guidance.
 
-### 5. **Now you're all set! 😄**
+1. **Now you're all set! 😄**
 
