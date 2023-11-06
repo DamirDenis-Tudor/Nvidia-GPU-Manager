@@ -48,10 +48,10 @@ check_nvidia_gpu_status() {
     commented_device=$(sed -n "/^\s*Section \"Screen\"/,/^EndSection/{/#\s*Device\s* \"$1\"/p}" "$XORG_CONFIG")
     if [[ -n $commented_device ]]; then
         print "Nvidia GPU is disabled." "warning"
-        return 1  # Return false
+        # return 1  # Return false
     else
         print "Nvidia GPU is enabled." "ok"
-        return 0  # Return true
+        # return 0  # Return true
     fi
 }
 
@@ -96,12 +96,13 @@ fi
 ACTION=""
 # check the command line arguments
 if [[ $1 =~ ^(--enable|-e)$ ]]; then
-
-    if ! [[ $(check_nvidia_gpu_status "$GPU_DEVICE") ]]; then
+    if [[ $(check_nvidia_gpu_status "$GPU_DEVICE") =~ ^(.*disabled.*)$ ]]; then
         print "Enabling NVIDIA GPU..." "info"
 
         # add nouveau on blacklist
-        find /usr/lib/modprobe.d/ -type f ! -name "aliases.conf" ! -name "systemd.conf" ! -name "ngpu-blacklist.conf" -delete
+        cd "/usr/lib/modprobe.d/"
+        find -type f ! -name "aliases.conf" ! -name "systemd.conf" ! -name "ngpu-blacklist.conf" -delete
+
         echo "blacklist nouveau" > "/usr/lib/modprobe.d/ngpu-blacklist.conf"
         echo "options nouveau modeset=0" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
 
@@ -111,11 +112,14 @@ if [[ $1 =~ ^(--enable|-e)$ ]]; then
     fi;
 
 elif [[ $1 =~ ^(--disable|-d)$ ]]; then
-    if [[ $(check_nvidia_gpu_status "$GPU_DEVICE") ]]; then
+    if [[ $(check_nvidia_gpu_status "$GPU_DEVICE") =~ ^(.*enabled.*)$ ]]; then
         print "Disabling NVIDIA GPU..." "info"
 
         # add nvidia drivers to blacklist
-        find /usr/lib/modprobe.d/ -type f ! -name "aliases.conf" ! -name "systemd.conf" ! -name "ngpu-blacklist.conf" -delete
+
+        cd "/usr/lib/modprobe.d/"
+        find -type f ! -name "aliases.conf" ! -name "systemd.conf" ! -name "ngpu-blacklist.conf" -delete
+
         echo "blacklist nvidia" > "/usr/lib/modprobe.d/ngpu-blacklist.conf"
         echo "blacklist nvidia-modeset" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
         echo "blacklist nvidia-drm" >> "/usr/lib/modprobe.d/ngpu-blacklist.conf"
@@ -147,7 +151,7 @@ fi;
 # e/d the nvidia gpu
 if [[ -n $ACTION  ]]; then
     print "Your system will be restarted in 5 seconds." "warning"
-    sleep 5
+    # sleep 5
 
     echo -n $NGPU_BUS_ID > "/sys/bus/pci/drivers/nvidia/$ACTION" &
     sudo reboot
